@@ -5,6 +5,12 @@ Create graphs of Erlang systems and programs.
 Getting Started
 ---------------
 
+First, install graphviz. On Ubuntu:
+
+    $ sudo aptitude install graphviz
+
+On OS X, download and install the [OS X version of graphviz][1].
+
 To compile grapherl, type:
 
     $ make
@@ -38,13 +44,21 @@ the following:
 
 This will create `my_node.svg` in the current directory.
 
+Tips
+---
+
+If you're using Gnome under Linux, use the option `{open,
+"gnome-open"}` to directly see the resulting image.
+
+If you're using OS X, use the option `{open, "open"}`.
 
 Contribute
 ----------
 
 Should you find yourself using grapherl and have issues, comments or
-feedback please [create an issue!] [1]
+feedback please [create an issue!] [2]
 
 Patches are greatly appreciated!
 
-[1]: http://github.com/eproxus/grapherl/issues "grapherl issues"
+[1]: http://www.pixelglow.com/graphviz/ "graphviz for OS X"
+[2]: http://github.com/eproxus/grapherl/issues "grapherl issues"
