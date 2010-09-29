@@ -11,7 +11,7 @@ To compile grapherl, type:
 
 or the equivalent `./rebar compile`.
 
-To start grapherl, type:
+To start a grapherl shell after compilation, type:
 
     $ erl -pa ebin
 
