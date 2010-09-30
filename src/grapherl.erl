@@ -151,7 +151,7 @@ create(Lines, Target, Options) ->
     end.
 
 dot(File, Target, Type) ->
-    TmpFile = string:strip(os:cmd("mktemp"), both, $\n),
+    TmpFile = string:strip(os:cmd("mktemp -t " ?MODULE_STRING ".XXXX"), both, $\n),
     ok = file:write_file(TmpFile, File),
     TargetName = Target ++ "." ++ Type,
     Result = os:cmd(io_lib:format("dot -T~p -o~p ~p",
