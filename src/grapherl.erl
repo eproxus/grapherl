@@ -50,6 +50,7 @@ applications(Dir, Target) ->
 %% `Dir' is the library directory of the release you want to graph. `Target'
 %5 is the target filename (without extension).
 applications(Dir, Target, Options) ->
+    check_dot(),
     try
         initialize_xref(?MODULE, Options),
         ok(xref:add_release(?MODULE, Dir, {name, ?MODULE})),
@@ -86,6 +87,7 @@ modules(Dir, Target) ->
 %% a direct source for .beam files.
 modules(Dir, Target, Options) ->
     %% TODO: Thickness of arrows could be number of calls?
+    check_dot(),
     try
         initialize_xref(?MODULE, Options),
         Path = ifc(proplists:is_defined(no_ebin, Options),
@@ -148,6 +150,14 @@ create(Lines, Target, Options) ->
             end;
         {Error, _File} ->
             {error, hd(string:tokens(Error, "\n"))}
+    end.
+
+check_dot() ->
+    case os:cmd("dot -V") of
+        "dot " ++ _ ->
+            ok;
+        _Else ->
+            erlang:error("dot was not found, please install graphviz",[])
     end.
 
 dot(File, Target, Type) ->
