@@ -32,6 +32,7 @@
 -copyright("Erlang Solutions Ltd.").
 -author("Adam Lindberg <eproxus@gmail.com>").
 
+-export([main/1]).
 -export([applications/2]).
 -export([applications/3]).
 -export([modules/2]).
@@ -40,6 +41,33 @@
 %%==============================================================================
 %% API Functions
 %%==============================================================================
+
+%% @hidden
+main(["-applications", Target]) ->
+    main(["-applications", "ebin", Target]);
+main(["-applications", Dir, Target]) ->
+    run(applications, [Dir, Target]);
+main(["-modules", Target]) ->
+    main(["-modules", "ebin", Target]);
+main(["-modules", Dir, Target]) ->
+    run(modules, [Dir, Target, [no_ebin]]);
+main(_) ->
+    io:format(
+      "Usage:~n"
+      " grapherl -applications Target~n"
+      " grapherl -applications Dir Target~n"
+      " grapherl -modules Target~n"
+      " grapherl -modules Dir Target~n"
+     ),
+    halt(1).
+
+run(Fun, Args) ->
+    case apply(?MODULE, Fun, Args) of
+	ok -> io:format("Ok~n");
+	{error, Error} ->
+	    io:format("Error:~n~p~n", [Error]),
+	    halt(1)
+    end.
 
 %% @equiv applications(Dir, Target, [{type, png}])
 applications(Dir, Target) ->
