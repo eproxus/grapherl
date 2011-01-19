@@ -98,12 +98,12 @@ modules(Dir, Target, Options) ->
             Else  -> Else
         end,
         Query = "ME ||| ["
-            ++ string:join([atom_to_list(M) || M <- Modules], ",")
+            ++ string:join(["'" ++ atom_to_list(M) ++ "'" || M <- Modules], ",")
             ++ "]",
         {ok, Results} = xref:q(?MODULE, Query),
         Relations = [uses(F, T) || {F, T} <- Results, F =/= T],
         create(["node [shape = box];"]
-               ++ [[atom_to_list(M), $;] || M <- Modules]
+               ++ [["\"" ++ atom_to_list(M) ++ "\"", $;] || M <- Modules]
                ++ Relations, Target, Options),
         stop_xref(?MODULE)
     catch
@@ -139,7 +139,7 @@ file(Lines) ->
     ["digraph application_graph {", Lines, "}"].
 
 uses(From, To) ->
-    [atom_to_list(From), " -> ", atom_to_list(To), $;].
+    [ "\"" ++ atom_to_list(From) ++ "\"", " -> ", "\"" ++ atom_to_list(To) ++ "\"", $;].
 
 create(Lines, Target, Options) ->
     case dot(file(Lines), Target, get_type(Options)) of
