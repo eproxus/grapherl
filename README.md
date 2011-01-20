@@ -9,7 +9,9 @@ First, install graphviz. On Ubuntu:
 
     $ sudo aptitude install graphviz
 
-On OS X, download and install the [OS X version of graphviz][1].
+On OS X, download and install the [OS X version of graphviz][1] or use [homebrew][2]:
+
+    $ brew install graphviz
 
 To compile grapherl, type:
 
@@ -56,9 +58,10 @@ Contribute
 ----------
 
 Should you find yourself using grapherl and have issues, comments or
-feedback please [create an issue!] [2]
+feedback please [create an issue!] [3]
 
 Patches are greatly appreciated!
 
 [1]: http://www.pixelglow.com/graphviz/ "graphviz for OS X"
-[2]: http://github.com/eproxus/grapherl/issues "grapherl issues"
+[2]: https://github.com/mxcl/homebrew "The missing package manager for OS"
+[3]: http://github.com/eproxus/grapherl/issues "grapherl issue tracker"
