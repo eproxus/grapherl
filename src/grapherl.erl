@@ -43,30 +43,41 @@
 %%==============================================================================
 
 %% @hidden
-main(["-applications", Target]) ->
-    main(["-applications", "ebin", Target]);
-main(["-applications", Dir, Target]) ->
+main(Args) ->
+    {ok, {Flags, _Rest} = Options} = getopt:parse(options(), Args),
+    case lists:member(help, Flags) of
+        true  -> print_options(), halt(0);
+        false -> run(Options)
+    end.
+
+run({[app], [Dir, Target]}) ->
     run(applications, [Dir, Target]);
-main(["-modules", Target]) ->
-    main(["-modules", "ebin", Target]);
-main(["-modules", Dir, Target]) ->
+run({[mod], [Dir, Target]}) ->
     run(modules, [Dir, Target, [no_ebin]]);
-main(_) ->
-    io:format(
-      "Usage:~n"
-      " grapherl -applications Target~n"
-      " grapherl -applications Dir Target~n"
-      " grapherl -modules Target~n"
-      " grapherl -modules Dir Target~n"
-     ),
-    halt(1).
+run({_Options, _Other}) ->
+    print_options(), halt(1).
+
+options() ->
+    [{help, $h, "help", undefined,
+      "Display this help text"},
+     {mod, $m, "modules", undefined,
+      "Analyse module dependencies (mutually exclusive)"},
+     {mod, $a, "applications", undefined,
+      "Analyse application dependencies (mutually exclusive)"}].
+
+print_options() ->
+    getopt:usage(options(), filename:basename(escript:script_name()),
+                 "SOURCE OUTPUT",
+                 [{"SOURCE", "The source directory to analyse"},
+                  {"OUTPUT", "Target ouput file"}]).
 
 run(Fun, Args) ->
     case apply(?MODULE, Fun, Args) of
-	ok -> io:format("Ok~n");
-	{error, Error} ->
-	    io:format("Error:~n~p~n", [Error]),
-	    halt(1)
+        ok ->
+            halt(0);
+        {error, Error} ->
+            io:format("grapherl: error: ~p~n", [Error]),
+            halt(2)
     end.
 
 %% @equiv applications(Dir, Target, [{type, png}])
