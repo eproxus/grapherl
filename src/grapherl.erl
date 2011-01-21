@@ -62,7 +62,7 @@ options() ->
       "Display this help text"},
      {mod, $m, "modules", undefined,
       "Analyse module dependencies (mutually exclusive)"},
-     {mod, $a, "applications", undefined,
+     {app, $a, "applications", undefined,
       "Analyse application dependencies (mutually exclusive)"}].
 
 print_options() ->
