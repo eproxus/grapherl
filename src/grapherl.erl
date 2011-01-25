@@ -209,15 +209,8 @@ dot(File, Target, Type) ->
     {Result, TargetName}.
 
 otp_apps() ->
-    [appmon, et, public_key, asn1, eunit, reltool, common_test, gs,
-     runtime_tools, compiler, hipe, sasl, cosEvent, ic, snmp,
-     cosEventDomain, inets, ssh, cosFileTransfer, inviso, ssl,
-     cosNotification, jinterface, stdlib, cosProperty, kernel,
-     syntax_tools, cosTime, megaco, test_server, cosTransactions,
-     mnesia, toolbar, crypto, observer, tools, debugger, odbc, tv,
-     dialyzer, orber, typer, docbuilder, os_mon, webtool, edoc,
-     otp_mibs, wx, erl_docgen, parsetools, xmerl, erl_interface,
-     percept, erts, pman].
+    {ok, Apps} = file:list_dir(filename:join(code:root_dir(), "lib")),
+    [list_to_atom(hd(string:tokens(A, "-"))) || A <- Apps].
 
 ok({ok, Result}) -> Result;
 ok(Error)        -> throw(Error).
