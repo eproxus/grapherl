@@ -9,7 +9,8 @@ First, install graphviz. On Ubuntu:
 
     $ sudo aptitude install graphviz
 
-On OS X, download and install the [OS X version of graphviz][1] or use [homebrew][2]:
+On OS X, download and install the [OS X version of graphviz][1] or use
+[homebrew][2]:
 
     $ brew install graphviz
 
@@ -22,6 +23,13 @@ or the equivalent `./rebar compile`.
 To start a grapherl shell after compilation, type:
 
     $ erl -pa ebin
+
+Alternatively, compile a grapherl stand-alone executable by doing:
+
+    $ ./rebar escriptize
+
+This will produce a `grapherl` executable in the root directory. Use
+the flags `-h` or `--help` to see wich arguments it needs.
 
 Examples
 --------
