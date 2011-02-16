@@ -2,3 +2,4 @@ ebin
 doc
 *.png
 grapherl
+.eunit
