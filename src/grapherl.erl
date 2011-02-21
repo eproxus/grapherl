@@ -38,6 +38,10 @@
 -export([modules/2]).
 -export([modules/3]).
 
+-ifdef(TEST).
+-include("grapherl_tests.hrl").
+-endif.
+
 %%==============================================================================
 %% API Functions
 %%==============================================================================
@@ -50,12 +54,19 @@ main(Args) ->
         false -> run(Options)
     end.
 
-run({[app], [Dir, Target]}) ->
-    run(applications, [Dir, Target]);
-run({[mod], [Dir, Target]}) ->
-    run(modules, [Dir, Target, [no_ebin]]);
+run({Options, [Dir, Target]}) ->
+    case get_mode(Options) of
+        {app, RestOpt} -> run(applications, [Dir, Target, RestOpt]);
+        {mod, RestOpt} -> run(modules, [Dir, Target, RestOpt])
+    end;
 run({_Options, _Other}) ->
     print_options(), halt(1).
+
+get_mode(Options) ->
+    case proplists:split(Options, [app, mod]) of
+        {[[app], []], Rest} -> {app, Rest};
+        {[[], [mod]], Rest} -> {mod, Rest}
+    end.
 
 options() ->
     [{help, $h, "help", undefined,
@@ -63,7 +74,9 @@ options() ->
      {mod, $m, "modules", undefined,
       "Analyse module dependencies (mutually exclusive)"},
      {app, $a, "applications", undefined,
-      "Analyse application dependencies (mutually exclusive)"}].
+      "Analyse application dependencies (mutually exclusive)"},
+     {type, $t, "type", string,
+      "Output file type (also deduced from file name)"}].
 
 print_options() ->
     getopt:usage(options(), filename:basename(escript:script_name()),
@@ -72,11 +85,15 @@ print_options() ->
                   {"OUTPUT", "Target ouput file"}]).
 
 run(Fun, Args) ->
-    case apply(?MODULE, Fun, Args) of
+    try apply(?MODULE, Fun, Args) of
         ok ->
             halt(0);
         {error, Error} ->
             io:format("grapherl: error: ~p~n", [Error]),
+            halt(2)
+    catch
+        error:type_not_specified ->
+            io:format("grapherl: error: File type not specified~n"),
             halt(2)
     end.
 
@@ -95,7 +112,7 @@ applications(Dir, Target, Options) ->
         ok(xref:add_release(?MODULE, Dir, {name, ?MODULE})),
         Excluded = ifc(proplists:is_defined(include_otp, Options),
                        [], otp_apps())
-        ++ proplists:get_value(excluded, Options, []),
+            ++ proplists:get_value(excluded, Options, []),
         {ok, Results} = xref:q(?MODULE, "AE"),
         Relations = [uses(F, T) ||
                         {F, T} <- Results,
@@ -129,13 +146,12 @@ modules(Dir, Target, Options) ->
     check_dot(),
     try
         initialize_xref(?MODULE, Options),
-        Path = ifc(proplists:is_defined(no_ebin, Options),
-                   Dir, filename:join([Dir, "ebin"])),
+        Path = get_path(Dir),
         ok(xref:add_directory(?MODULE, Path)),
         Modules = case ok(xref:q(?MODULE, "AM")) of
-            [] -> throw({error, no_modules_found});
-            Else  -> Else
-        end,
+                      [] -> throw({error, no_modules_found});
+                      Else  -> Else
+                  end,
         Query = "ME ||| ["
             ++ string:join(["'" ++ atom_to_list(M) ++ "'" || M <- Modules], ",")
             ++ "]",
@@ -155,6 +171,12 @@ modules(Dir, Target, Options) ->
 %% Internal Functions
 %%==============================================================================
 
+get_path(Dir) ->
+    case filelib:wildcard(filename:join(Dir, "*.beam")) of
+        []     -> filename:join(Dir, "ebin");
+        _Beams  -> Dir
+    end.
+
 initialize_xref(Name, Options) ->
     case xref:start(Name) of
         {error, {already_started, _}} ->
@@ -171,17 +193,27 @@ stop_xref(Ref) ->
     xref:stop(Ref),
     ok.
 
-get_type(Options) ->
-    atom_to_list(proplists:get_value(type, Options, png)).
+get_type(Options, Target) ->
+    case proplists:get_value(type, Options) of
+        undefined -> type_from_filename(Target);
+        Type -> atom_to_list(Type)
+    end.
+
+type_from_filename(Filename) ->
+    case filename:extension(Filename) of
+        ""          -> erlang:error(type_not_specified);
+        "." ++ Type -> Type
+    end.
 
 file(Lines) ->
     ["digraph application_graph {", Lines, "}"].
 
 uses(From, To) ->
-    [ "\"" ++ atom_to_list(From) ++ "\"", " -> ", "\"" ++ atom_to_list(To) ++ "\"", $;].
+    ["\"" ++ atom_to_list(From) ++ "\"", " -> ",
+     "\"" ++ atom_to_list(To) ++ "\"", $;].
 
 create(Lines, Target, Options) ->
-    case dot(file(Lines), Target, get_type(Options)) of
+    case dot(file(Lines), Target, get_type(Options, Target)) of
         {"", File}    ->
             case proplists:get_value(open, Options) of
                 undefined -> ok;
@@ -202,11 +234,17 @@ check_dot() ->
 dot(File, Target, Type) ->
     TmpFile = string:strip(os:cmd("mktemp -t " ?MODULE_STRING ".XXXX"), both, $\n),
     ok = file:write_file(TmpFile, File),
-    TargetName = Target ++ "." ++ Type,
+    TargetName = add_extension(Target, Type),
     Result = os:cmd(io_lib:format("dot -T~p -o~p ~p",
                                   [Type, TargetName, TmpFile])),
     ok = file:delete(TmpFile),
     {Result, TargetName}.
+
+add_extension(Target, Type) ->
+    case filename:extension(Target) of
+        "." ++ Type -> Target;
+        _Else -> Target ++ "." ++ Type
+    end.
 
 otp_apps() ->
     {ok, Apps} = file:list_dir(filename:join(code:root_dir(), "lib")),
@@ -214,7 +252,6 @@ otp_apps() ->
 
 ok({ok, Result}) -> Result;
 ok(Error)        -> throw(Error).
-
 
 ifc(true, True, _)   -> True;
 ifc(false, _, False) -> False.
