@@ -196,7 +196,8 @@ stop_xref(Ref) ->
 get_type(Options, Target) ->
     case proplists:get_value(type, Options) of
         undefined -> type_from_filename(Target);
-        Type -> atom_to_list(Type)
+        Type when is_atom(Type) -> atom_to_list(Type);
+        Type -> Type
     end.
 
 type_from_filename(Filename) ->
