@@ -215,7 +215,7 @@ uses(From, To) ->
 
 create(Lines, Target, Options) ->
     case dot(file(Lines), Target, get_type(Options, Target)) of
-        {"", File}    ->
+        {ok, File}    ->
             case proplists:get_value(open, Options) of
                 undefined -> ok;
                 Command -> os:cmd(Command ++ " " ++ File), ok
@@ -235,10 +235,16 @@ check_dot() ->
 dot(File, Target, Type) ->
     TmpFile = string:strip(os:cmd("mktemp -t " ?MODULE_STRING ".XXXX"), both, $\n),
     ok = file:write_file(TmpFile, File),
+
     TargetName = add_extension(Target, Type),
-    Result = os:cmd(io_lib:format("dot -T~p -o~p ~p",
-                                  [Type, TargetName, TmpFile])),
-    ok = file:delete(TmpFile),
+    Result = case Type of
+            "dot" -> file:write_file(TargetName, File);
+            _ ->
+                case os:cmd(io_lib:format("dot -T~p -o~p ~p", [Type, TargetName, TmpFile])) of
+                    "" -> ok;
+                    X -> X
+                end
+    end,
     {Result, TargetName}.
 
 add_extension(Target, Type) ->
