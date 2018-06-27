@@ -66,7 +66,7 @@ Contribute
 ----------
 
 Should you find yourself using grapherl and have issues, comments or
-feedback please [create an issue!] [3]
+feedback please [create an issue!][3]
 
 Patches are greatly appreciated!
 
