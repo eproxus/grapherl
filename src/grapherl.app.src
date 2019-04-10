@@ -1,8 +1,15 @@
+{application, grapherl, [
+	{description, "Create graphs of Erlang systems and programs"},
+	{vsn, "2.0-alpha"},
+	{registered, []},
+	{applications, [
+		kernel,
+    	stdlib,
+    	tools
+	]},
+	{env,[]},
+	{modules, []},
 
-{application, grapherl,
- [{description, "Create graphs of Erlang systems and programs."},
-  {vsn, "1.0"},
-  {registered, []},
-  {applications, [kernel, stdlib, tools]},
-  {env, []}
- ]}.
+	{licenses, ["Apache 2.0"]},
+	{links, []}
+]}.
