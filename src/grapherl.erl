@@ -52,20 +52,34 @@ get_mode(Options) ->
     end.
 
 options() ->
-    [{help, $h, "help", undefined,
-      "Display this help text"},
-     {mod, $m, "modules", undefined,
-      "Analyse module dependencies (mutually exclusive)"},
-     {app, $a, "applications", undefined,
-      "Analyse application dependencies (mutually exclusive)"},
-     {type, $t, "type", string,
-      "Output file type (also deduced from file name)"}].
+    [
+        {help, $h, "help", undefined,
+            "Display this help text"
+        },
+        {mod, $m, "modules", undefined,
+            "Analyse module dependencies (mutually exclusive)"
+        },
+        {app, $a, "applications", undefined,
+            "Analyse application dependencies (mutually exclusive)"
+        },
+        {type, $t, "type", string,
+            "Output file type (also deduced from file name)"
+        },
+        {include_otp, $l, "include-otp", boolean,
+            "Include OTP applications in graph"
+        }
+    ].
 
 print_options() ->
-    getopt:usage(options(), filename:basename(escript:script_name()),
-                 "SOURCE OUTPUT",
-                 [{"SOURCE", "The source directory to analyse"},
-                  {"OUTPUT", "Target ouput file"}]).
+    getopt:usage(
+        options(),
+        filename:basename(escript:script_name()),
+        "SOURCE OUTPUT",
+        [
+            {"SOURCE", "The source directory to analyse"},
+            {"OUTPUT", "Target ouput file"}
+        ]
+    ).
 
 run(Fun, Args) ->
     try apply(?MODULE, Fun, Args) of
