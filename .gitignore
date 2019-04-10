@@ -1,5 +1,23 @@
-ebin
-doc
-*.png
-grapherl
+# Rebar 3
+.rebar3
+_*
 .eunit
+*.o
+*.beam
+*.plt
+*.swp
+*.swo
+.erlang.cookie
+ebin
+log
+erl_crash.dump
+.rebar
+logs
+_build
+.idea
+*.iml
+rebar3.crashdump
+*~
+
+# Grapherl
+*.png

@@ -1,38 +1,41 @@
-grapherl
-========
+# grapherl
+
 Create graphs of Erlang systems and programs.
 
-Getting Started
----------------
+## Getting Started
 
-First, install graphviz. On Ubuntu:
 
-    $ sudo aptitude install graphviz
+### Dependencies
 
-On OS X, download and install the [OS X version of graphviz][1] or use
-[homebrew][2]:
+* [Rebar 3][1]
+* Graphviz
+    * Ubuntu
+      ```
+      $ sudo apt install graphviz
+      ```
+    * macOS ([Homebrew][2])
+      ```
+      $ brew install graphviz
+      ```
 
-    $ brew install graphviz
+### Build
 
-To compile grapherl, type:
+To create a grapherl binary:
 
-    $ make
+```
+$ rebar3 escriptize
+```
 
-or the equivalent `./rebar compile`.
+The binary will be located at `_build/default/bin/grapherl`. Use the flags `-h` or `--help` to see wich arguments it needs.
 
-To start a grapherl shell after compilation, type:
+To start an interactive shell:
 
-    $ erl -pa ebin
+```
+$ rebar3 shell
+```
 
-Alternatively, compile a grapherl stand-alone executable by doing:
+# Examples
 
-    $ ./rebar escriptize
-
-This will produce a `grapherl` executable in the root directory. Use
-the flags `-h` or `--help` to see wich arguments it needs.
-
-Examples
---------
 Here's some examples of using grapherl.
 
 The following two calls are equal. They will both generate
@@ -54,22 +57,21 @@ the following:
 
 This will create `my_node.svg` in the current directory.
 
-Tips
----
+# Tips
 
 If you're using Gnome under Linux, use the option `{open,
 "gnome-open"}` to directly see the resulting image.
 
 If you're using OS X, use the option `{open, "open"}`.
 
-Contribute
-----------
+# Contribute
 
 Should you find yourself using grapherl and have issues, comments or
 feedback please [create an issue!][3]
 
 Patches are greatly appreciated!
 
-[1]: http://www.pixelglow.com/graphviz/ "graphviz for OS X"
+
+[1]: https://www.rebar3.org "Rebar 3 build tool for Erlang"
 [2]: https://github.com/mxcl/homebrew "The missing package manager for OS"
 [3]: http://github.com/eproxus/grapherl/issues "grapherl issue tracker"
