@@ -1,10 +1,10 @@
 all:
-	@./rebar compile escriptize
+	@rebar3 compile escriptize
 
 test: force
-	@./rebar eunit
+	@rebar3 eunit
 
 clean:
-	@./rebar clean
+	@rebar3 clean
 
 force: ;
